@@ -26,4 +26,26 @@ public class AuthController {
         }
 
     }
+
+    @PostMapping("/login")
+    public String login(@RequestBody MyUser myUser) {
+        if (authService.correctcredentials(myUser)) {
+            return authService.generateJWt(myUser);
+        }
+        else return "Wrong username or password";
+
+    }
+    @PostMapping("/oauth")
+    public String oauth(@RequestBody String credential){
+        if(authService.verifyGoogleToken(credential)!=null) {
+            MyUser user= authService.extractUserDetailsFromToken(credential);
+            if(!authService.useralreadyexists(user.getUsername())){
+                myRepo.save(user);
+            }
+            return authService.generateJWt(authService.extractUserDetailsFromToken(credential));
+        }
+        else return "Invalid credentials";
+    }
+
+
 }
