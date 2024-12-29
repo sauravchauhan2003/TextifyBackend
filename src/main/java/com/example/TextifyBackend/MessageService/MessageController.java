@@ -1,6 +1,7 @@
 package com.example.TextifyBackend.MessageService;
 
 import com.example.TextifyBackend.Authentication.AuthService;
+import com.example.TextifyBackend.Repo.MyRepo;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,6 +13,8 @@ import java.util.List;
 
 @RestController
 public class MessageController {
+    @Autowired
+    private MyRepo myRepo;
     @Autowired
     private MessageService messageService;
     @Autowired
@@ -36,5 +39,16 @@ public class MessageController {
     @PostMapping("/sendmessage")
     public void sendmessage(@RequestBody Message message){
         messageService.sendMessage(message);
+    }
+    @GetMapping("/getusers")
+    public List<String> getuser(HttpServletRequest request){
+        String auth_header=request.getHeader("Authorization");
+        String token =null;
+        String username=null;
+        if(auth_header!=null && auth_header.startsWith("Bearer")){
+            token=auth_header.substring(7);
+            username=authService.extractUsername(token);
+        }
+        return myRepo.findAllUsernamesExcept(username);
     }
 }

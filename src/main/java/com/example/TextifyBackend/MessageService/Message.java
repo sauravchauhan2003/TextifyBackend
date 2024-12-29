@@ -1,7 +1,9 @@
 package com.example.TextifyBackend.MessageService;
 
-import java.sql.Timestamp;
+import jakarta.persistence.Entity;
 
+import java.sql.Timestamp;
+@Entity
 public class Message {
     private String sender;
     private String receiver;
