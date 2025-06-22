@@ -1,0 +1,12 @@
+com\example\demo\DemoApplication.class
+com\example\demo\SavedMessages.class
+com\example\demo\WebRtcHandler.class
+com\example\demo\WebSocketConfig.class
+com\example\demo\Authentication\AuthController.class
+com\example\demo\Message.class
+com\example\demo\Authentication\WebsocketInterceptor.class
+com\example\demo\Authentication\UserEntity.class
+com\example\demo\SimpleWebSocketHandler.class
+com\example\demo\Authentication\UserRepository.class
+com\example\demo\SavedMessagesRepository.class
+com\example\demo\Authentication\JWTUtil.class
