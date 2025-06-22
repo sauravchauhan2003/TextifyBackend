@@ -12,6 +12,7 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 @Component
 public class SimpleWebSocketHandler extends TextWebSocketHandler {
@@ -37,25 +38,32 @@ public class SimpleWebSocketHandler extends TextWebSocketHandler {
                 userSessions.put(username, session);
                 usernames.put(session, username);
 
-                // Notify all active users about the new connection
+                // Notify all other users about the new connection
                 String connectMessage = objectMapper.writeValueAsString(
                         Map.of("type", "connect", "user", username)
                 );
                 for (WebSocketSession activeSession : userSessions.values()) {
-                    if (activeSession.isOpen()) {
+                    if (activeSession != session && activeSession.isOpen()) {
                         activeSession.sendMessage(new TextMessage(connectMessage));
                     }
                 }
 
-                // Send all registered users to the newly connected client
-                List<String> allUsers = userRepository.findAllUsernames();
+                // Send all registered users (excluding self)
+                List<String> allUsers = userRepository.findAllUsernames()
+                        .stream()
+                        .filter(u -> !u.equals(username))
+                        .collect(Collectors.toList());
                 session.sendMessage(new TextMessage(objectMapper.writeValueAsString(
                         Map.of("type", "allUsers", "users", allUsers)
                 )));
 
-                // Send currently active users to the newly connected client
+                // Send currently active users (excluding self)
+                List<String> activeUsers = userSessions.keySet()
+                        .stream()
+                        .filter(u -> !u.equals(username))
+                        .collect(Collectors.toList());
                 session.sendMessage(new TextMessage(objectMapper.writeValueAsString(
-                        Map.of("type", "activeUsers", "users", userSessions.keySet())
+                        Map.of("type", "activeUsers", "users", activeUsers)
                 )));
 
                 // Send any undelivered messages

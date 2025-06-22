@@ -15,13 +15,13 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class WebRtcHandler extends TextWebSocketHandler {
 
-    // Maps for tracking users
     private final Map<String, WebSocketSession> userSessions = new ConcurrentHashMap<>();
     private final Map<WebSocketSession, String> sessionUsers = new ConcurrentHashMap<>();
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
         Object userObj = session.getAttributes().get("user");
+        System.out.println("WebSocket connection established. User: " + userObj);
         if (userObj instanceof UserEntity user) {
             String username = user.getUsername();
             if (username != null) {
@@ -47,8 +47,9 @@ public class WebRtcHandler extends TextWebSocketHandler {
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws IOException {
         String payload = message.getPayload();
-        JSONObject json = new JSONObject(payload);
+        System.out.println("Received WebRTC message: " + payload);
 
+        JSONObject json = new JSONObject(payload);
         String to = json.optString("to");
         String from = json.optString("from");
         String type = json.optString("type");
